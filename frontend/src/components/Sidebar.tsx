@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isDark, toggleTheme,
         </div>
 
         <div className={`p-4 text-center opacity-30 text-[10px] font-black uppercase border-t-2 ${isDark ? 'bg-zinc-900 text-white border-white/5' : 'bg-white border-black/5'}`}>
-          Pioneer Station v2.5
+          Pioneer Station v0.1
         </div>
       </div>
     </>

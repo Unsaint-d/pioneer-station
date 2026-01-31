@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowDownCircle, Camera, Clock, GripVertical, Plus, Rota
 import { AppContext } from '../context/AppContext';
 import type { ActionType, FlightPoint } from '../types';
 import { HOME_POINT_ID } from '../utils/flightPlan';
+import { actionLabels } from '../utils/helpers';
 
 const PointSettings = () => {
   const context = useContext(AppContext);
@@ -24,7 +25,6 @@ const PointSettings = () => {
   const isHeightInvalid = point.id !== HOME_POINT_ID && !Number.isNaN(zValue) && zValue < 0.1;
 
   const actionIcons: Record<ActionType, React.ElementType> = { photo: Camera, rotate: RotateCw, wait: Clock, land: ArrowDownCircle };
-  const actionLabels: Record<ActionType, string> = { photo: 'Фотоснимок', rotate: 'Поворот', wait: 'Ожидание', land: 'Посадка' };
   const allActionTypes: ActionType[] = ['photo', 'rotate', 'wait', 'land'];
   const isHomePoint = point.id === HOME_POINT_ID;
 

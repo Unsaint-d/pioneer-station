@@ -38,5 +38,4 @@ __pycache__/
 .stignore
 .sync-*
 
-# Production
-start.bat
+
