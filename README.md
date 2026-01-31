@@ -90,7 +90,7 @@ source .venv/bin/activate
 pip install -r backend_requirements.txt
 py -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
-
+Запуск **Frontend** и **Backend** части проекта должен производиться в разных экземплярах терминала (в разных окнах).
 ---
 
 ## 📚 Open Source компоненты
