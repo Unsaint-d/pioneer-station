@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
-from ..services.drone_service import DroneService, get_drone_service
-from ..services.mission_service import MissionService, get_mission_service
-from ..core.config import settings
-from ..core.utils import check_ip_availability
-from ..core.schemas import AvailabilityResponse, ConnectionResponse, MessageResponse
+from services.drone_service import DroneService, get_drone_service
+from services.mission_service import MissionService, get_mission_service
+from core.config import settings
+from core.utils import check_ip_availability
+from core.schemas import AvailabilityResponse, ConnectionResponse, MessageResponse
 
 router = APIRouter()
 

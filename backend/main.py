@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .endpoints import connection, telemetry, control, mission
+from endpoints import connection, telemetry, control, mission
 
 app = FastAPI()
 

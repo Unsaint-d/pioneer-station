@@ -3,8 +3,8 @@ import time
 from typing import Optional, List
 from pioneer_sdk import Pioneer
 from fastapi import HTTPException
-from ..core.config import settings
-from ..core.utils import check_ip_availability
+from core.config import settings
+from core.utils import check_ip_availability
 
 class DroneService:
     _instance = None

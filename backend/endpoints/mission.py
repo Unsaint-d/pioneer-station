@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
-from ..services.drone_service import DroneService, get_drone_service
-from ..services.mission_service import MissionService, get_mission_service
-from ..core.schemas import MissionPlan, MessageResponse
+from services.drone_service import DroneService, get_drone_service
+from services.mission_service import MissionService, get_mission_service
+from core.schemas import MissionPlan, MessageResponse
 
 router = APIRouter()
 

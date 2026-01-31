@@ -37,3 +37,6 @@ __pycache__/
 .stfolder
 .stignore
 .sync-*
+
+# Production
+start.bat

@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException
-from ..services.drone_service import DroneService, get_drone_service
+from services.drone_service import DroneService, get_drone_service
 
 def verify_connected(drone_service: DroneService = Depends(get_drone_service)) -> DroneService:
     """
