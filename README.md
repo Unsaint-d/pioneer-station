@@ -69,7 +69,7 @@
 
 ```bash
 cd frontend
-npm install
+npm install # - при первом запуске
 npm run dev
 ```
 
