@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Activity, Menu, Wifi } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Activity, Menu, Wifi, Camera, Map as MapIcon } from 'lucide-react';
 import { AppContext } from './context/AppContext';
 import type { ActionParamKey, ActionType, ActionParams, AppState, FlightPoint, LogEntry, SavedFlightPlan } from './types';
 import { createHomePoint, generateId, HOME_POINT_ID } from './utils/flightPlan';
 import { getErrorMessage, getApStatusDisplay, getBatteryPercent, getBatteryColor } from './utils/helpers';
 import ConsolePanel from './components/ConsolePanel';
 import FlightPlanPanel from './components/FlightPlanPanel';
+import CameraPanel from './components/CameraPanel';
 import MiniMap from './components/MiniMap';
 import PointSettings from './components/PointSettings';
 import Sidebar from './components/Sidebar';
@@ -61,9 +62,66 @@ export default function App() {
   const [history, setHistory] = useState<FlightPoint[][]>([]);
   const [future, setFuture] = useState<FlightPoint[][]>([]);
   const [isCardVisible, setIsCardVisible] = useState(false);
+  const [rightPanelMode, setRightPanelMode] = useState<'plan' | 'camera'>('plan');
+  const [activePanel, setActivePanel] = useState<'plan' | 'camera'>('plan');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(75);
+  const [isResizing, setIsResizing] = useState(false);
+  
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const pointSettingsRef = useRef<HTMLDivElement>(null);
   const flightPlanRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (rightPanelMode !== activePanel) {
+      setIsTransitioning(true);
+      const timer = setTimeout(() => {
+        setActivePanel(rightPanelMode);
+        // Small delay to ensure content swap happens while invisible, then fade in
+        setTimeout(() => setIsTransitioning(false), 50);
+      }, 200); // Match transition duration
+      return () => clearTimeout(timer);
+    }
+  }, [rightPanelMode, activePanel]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      // We use the map container's parent to calculate the width
+      const container = mapContainerRef.current?.parentElement;
+      if (!container) return;
+      
+      const containerRect = container.getBoundingClientRect();
+      // Calculate new percentage based on mouse position relative to container
+      // Subtract half of the resizer width (12px) to center it under the cursor roughly
+      let newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      
+      // Clamp values (min 20%, max 80%)
+      if (newWidth < 70) newWidth = 70;
+      if (newWidth > 80) newWidth = 80;
+      
+      setLeftPanelWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
 
   const normalizePointsState = (points: FlightPoint[], currentSelectedId: string | null) => {
     const idMap = new Map<string, string>();
@@ -535,8 +593,8 @@ export default function App() {
          currentView={currentView}
        />
        <div className={`w-full min-h-[max(1080px,100vh)] lg:h-screen flex flex-col font-sans transition-colors ${state.darkMode ? 'bg-zinc-950 text-white' : 'bg-gray-50 text-black'}`}>
-         <header className="flex flex-col lg:flex-row gap-6 items-start p-4 md:p-6 pb-2">
-           <div className="flex items-center gap-4 lg:basis-9/12 w-full">
+         <header className="flex flex-col lg:flex-row gap-6 items-center p-4 md:p-6 pb-2" style={{ '--left-width': `${leftPanelWidth}%` } as React.CSSProperties}>
+           <div className="flex items-center gap-4 lg:basis-[calc(var(--left-width)-12px)] shrink-0 w-full">
             <button 
               onClick={() => setIsSidebarOpen(true)} 
               className={`p-2.5 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'}`}
@@ -544,13 +602,32 @@ export default function App() {
             >
               <Menu size={18} className={state.darkMode ? 'text-white' : 'text-black'} />
             </button>
-            <div>
+            <div className="flex-1">
                <h1 className="text-4xl font-black italic uppercase leading-none">Pioneer <span className="text-yellow-500">Control</span></h1>
                <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mt-1">Drone Control System v0.1</p>
              </div>
+             
+             {/* View Toggle Buttons - Moved here */}
+            <div className={`flex items-center gap-1 p-1 h-[44px] border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} hidden md:flex`}>
+              <button
+                onClick={() => setRightPanelMode('plan')}
+                className={`p-2 rounded-xl transition-all ${rightPanelMode === 'plan' ? (state.darkMode ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-black') : 'text-zinc-400 hover:text-zinc-600'}`}
+                title="План полёта"
+              >
+                <MapIcon size={20} />
+              </button>
+              <button
+                onClick={() => setRightPanelMode('camera')}
+                className={`p-2 rounded-xl transition-all ${rightPanelMode === 'camera' ? (state.darkMode ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-black') : 'text-zinc-400 hover:text-zinc-600'}`}
+                title="Камера"
+              >
+                <Camera size={20} />
+              </button>
+            </div>
            </div>
            
-           <div className="flex items-center gap-3 lg:basis-3/12 shrink-0 w-full">
+           <div className="flex items-center gap-3 lg:basis-[calc(100%-var(--left-width)-12px)] shrink-0 w-full">
+
             {/* Connection Status Pill */}
             <div 
               className={`flex items-center justify-center w-[44px] h-[44px] shrink-0 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} transition-all`}
@@ -593,12 +670,12 @@ export default function App() {
           </div>
          </header>
 
-         <main className="flex-1 flex flex-col gap-6 p-4 md:p-6 pt-0 overflow-hidden">
+         <main className="flex-1 flex flex-col gap-6 p-4 md:p-6 pt-0 overflow-hidden" style={{ '--left-width': `${leftPanelWidth}%` } as React.CSSProperties}>
            {currentView === 'editor' ? (
-             <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0 relative">
+             <div className="flex-1 flex flex-col gap-6 lg:gap-0 lg:flex-row min-h-0 relative">
               <section 
                   ref={mapContainerRef} 
-                  className="flex-1 lg:basis-9/12 min-h-0 relative z-0 overflow-hidden"
+                  className="flex-1 lg:basis-[calc(var(--left-width)-12px)] min-h-0 relative z-10 overflow-hidden shrink-0"
                 >
                  <MiniMap />
                  <div 
@@ -612,11 +689,22 @@ export default function App() {
                    <PointSettings key={state.selectedPointId ?? 'none'} />
                  </div>
                </section>
+
+              {/* Resizer Handle - Desktop Only */}
+              <div
+                className="hidden lg:flex w-16 -mx-5 cursor-col-resize items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors z-0 select-none shrink-0 rounded-xl"
+                onMouseDown={(e) => { e.preventDefault(); setIsResizing(true); }}
+              >
+                <div className="w-1 h-8 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+              </div>
+
               <section 
                 ref={flightPlanRef} 
-                className="lg:basis-3/12 lg:min-h-0 shrink-0 relative z-50 h-auto lg:h-full"
+                className="lg:basis-[calc(100%-var(--left-width)-12px)] lg:min-h-0 shrink-0 relative z-50 h-auto lg:h-full overflow-hidden"
               >
-                 <FlightPlanPanel />
+                 <div className={`w-full h-full transition-opacity duration-200 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                   {activePanel === 'plan' ? <FlightPlanPanel /> : <CameraPanel />}
+                 </div>
                </section>
              </div>
            ) : (
