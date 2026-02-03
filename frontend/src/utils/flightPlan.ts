@@ -7,7 +7,7 @@ export const createHomePoint = (): FlightPoint => ({
   name: '0',
   x: 0,
   y: 0,
-  z: 0,
+  z: 1,
   actions: [],
   createdAt: new Date().toISOString()
 });

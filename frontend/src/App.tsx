@@ -597,7 +597,7 @@ export default function App() {
            <div className="flex items-center gap-4 lg:basis-[calc(var(--left-width)-12px)] shrink-0 w-full">
             <button 
               onClick={() => setIsSidebarOpen(true)} 
-              className={`p-2.5 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'}`}
+              className={`w-11 h-11 flex items-center justify-center border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'}`}
               title="Меню"
             >
               <Menu size={18} className={state.darkMode ? 'text-white' : 'text-black'} />
@@ -608,7 +608,7 @@ export default function App() {
              </div>
              
              {/* View Toggle Buttons - Moved here */}
-            <div className={`flex items-center gap-1 p-1 h-[44px] border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} hidden md:flex`}>
+            <div className={`flex items-center gap-1 p-1 h-11 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} hidden md:flex`}>
               <button
                 onClick={() => setRightPanelMode('plan')}
                 className={`p-2 rounded-xl transition-all ${rightPanelMode === 'plan' ? (state.darkMode ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-black') : 'text-zinc-400 hover:text-zinc-600'}`}
@@ -630,7 +630,7 @@ export default function App() {
 
             {/* Connection Status Pill */}
             <div 
-              className={`flex items-center justify-center w-[44px] h-[44px] shrink-0 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} transition-all`}
+              className={`flex items-center justify-center w-11 h-11 shrink-0 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} transition-all`}
               title={`Connection: ${state.connectionStatus}`}
             >
               <Wifi size={20} className={state.connectionStatus === 'CONNECTED' ? 'text-green-500' : 'text-zinc-400'} />
@@ -638,7 +638,7 @@ export default function App() {
 
             {/* Autopilot Status Pill */}
             <div 
-              className={`flex-1 flex items-center justify-center gap-2 px-3 h-[44px] min-w-[80px] border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} transition-all overflow-hidden cursor-help`}
+              className={`flex-1 flex items-center justify-center gap-2 px-3 h-11 min-w-20 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} transition-all overflow-hidden cursor-help`}
               title={apDisplay.label}
             >
               <Activity size={18} className={apDisplay.color} />
@@ -653,11 +653,11 @@ export default function App() {
             </div>
 
             {/* Battery Status Pill */}
-            <div className={`flex items-center justify-between px-3 h-[44px] min-w-[100px] border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} transition-all`}>
+            <div className={`flex items-center justify-between px-3 h-11 min-w-[6.25rem] border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${state.darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white'} transition-all`}>
                <div className="flex items-center gap-2 w-full justify-center">
                  <div className="relative w-7 h-3.5 shrink-0 flex items-center justify-center">
-                   <div className="absolute inset-0 border-2 rounded-[4px]" style={{ borderColor: batteryColor }} />
-                   <div className="w-[22px] h-[8px] overflow-hidden rounded-[1px] z-10">
+                   <div className="absolute inset-0 border-2 rounded" style={{ borderColor: batteryColor }} />
+                   <div className="w-[1.375rem] h-2 overflow-hidden rounded-[0.0625rem] z-10">
                      <div className="h-full transition-all duration-500" style={{ width: `${batteryPercent}%`, backgroundColor: batteryColor }} />
                    </div>
                    <div className={`absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-1.5 border-2 border-l-0 rounded-r-[2px] rounded-l-none z-10 ${state.darkMode ? 'bg-zinc-900' : 'bg-white'}`} style={{ borderColor: batteryColor }} />
@@ -675,7 +675,7 @@ export default function App() {
              <div className="flex-1 flex flex-col gap-6 lg:gap-0 lg:flex-row min-h-0 relative">
               <section 
                   ref={mapContainerRef} 
-                  className="flex-1 lg:basis-[calc(var(--left-width)-12px)] min-h-0 relative z-10 overflow-hidden shrink-0"
+                  className="flex-1 lg:basis-[calc(var(--left-width)-0.75rem)] min-h-0 relative z-10 overflow-hidden shrink-0"
                 >
                  <MiniMap />
                  <div 
@@ -700,7 +700,7 @@ export default function App() {
 
               <section 
                 ref={flightPlanRef} 
-                className="lg:basis-[calc(100%-var(--left-width)-12px)] lg:min-h-0 shrink-0 relative z-50 h-auto lg:h-full overflow-hidden"
+                className="lg:basis-[calc(100%-var(--left-width)-0.75rem)] lg:min-h-0 shrink-0 relative z-50 h-auto lg:h-full overflow-hidden"
               >
                  <div className={`w-full h-full transition-opacity duration-200 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
                    {activePanel === 'plan' ? <FlightPlanPanel /> : <CameraPanel />}
