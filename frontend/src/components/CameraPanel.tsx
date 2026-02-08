@@ -21,24 +21,20 @@ export default function CameraPanel() {
   const { state } = context;
   const isDark = state.darkMode;
 
-  // Revert video source to drone when dev mode is disabled
   useEffect(() => {
     if (!isDevMode && videoSource !== 'drone') {
       handleSetSource('drone');
     }
   }, [isDevMode]);
 
-  // Fetch processors and settings when settings are opened
   useEffect(() => {
     if (isSettingsOpen) {
       setIsLoadingProcessors(true);
       
-      // Get list of processors
       fetch('http://localhost:8000/processors/list')
         .then(res => res.json())
         .then(data => {
           setProcessors(data);
-          // Get active processor
           return fetch('http://localhost:8000/processors/active');
         })
         .then(res => res.json())
@@ -48,7 +44,6 @@ export default function CameraPanel() {
         .catch(err => console.error('Failed to fetch processors:', err))
         .finally(() => setIsLoadingProcessors(false));
 
-      // Get video source
       fetch('http://localhost:8000/camera/source')
         .then(res => res.json())
         .then(data => setVideoSource(data.source))
@@ -77,7 +72,6 @@ export default function CameraPanel() {
         body: JSON.stringify({ source })
       });
       setVideoSource(source);
-      // Refresh stream to reflect changes immediately
       setRefreshKey(prev => prev + 1);
     } catch (err) {
       console.error('Failed to set video source:', err);
@@ -109,7 +103,6 @@ export default function CameraPanel() {
 
   return (
     <div className={`h-full flex flex-col ${isDark ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-black'} rounded-[18px] border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden transition-colors`}>
-      {/* Header */}
       <div className={`p-4 border-b-2 border-black flex items-center justify-between shrink-0 ${isDark ? 'bg-zinc-800' : 'bg-gray-50'}`}>
         <div className="flex items-center gap-3">
           <button 
@@ -125,15 +118,11 @@ export default function CameraPanel() {
         </div>
       </div>
       
-      {/* Main Content Area */}
       <div className={`flex-1 relative overflow-hidden ${isDark ? 'bg-zinc-950' : 'bg-zinc-100'}`}>
-        {/* Content Wrapper for Fade Transition */}
         <div className={`absolute inset-0 flex flex-col transition-opacity duration-100 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           
           {activeView === 'video' ? (
-            /* Video View */
             <div className="w-full h-full flex items-center justify-center bg-black overflow-hidden relative">
-               {/* 4:3 Aspect Ratio Container that fits within the available space */}
                <div className="relative w-full h-full max-w-full max-h-full aspect-[4/3] mx-auto">
                 {!error ? (
                   <img 
@@ -160,11 +149,9 @@ export default function CameraPanel() {
                </div>
             </div>
           ) : (
-            /* Settings View */
             <div className="w-full h-full p-6 overflow-y-auto">
               <div className="flex flex-col gap-6">
 
-                {/* Developer Mode Toggle */}
                 <div className={`flex items-center justify-between p-4 rounded-xl border-2 ${isDark ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-200'}`}>
                   <div className="flex flex-col">
                      <span className={`font-bold text-sm ${isDark ? 'text-white' : 'text-black'}`}>Режим разработчика</span>
@@ -178,7 +165,6 @@ export default function CameraPanel() {
                   </button>
                 </div>
 
-                {/* Video Source Selection (Dev Mode Only) */}
                 {isDevMode && (
                   <div className={`p-4 rounded-xl border-2 ${isDark ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-200'}`}>
                     <h3 className={`font-black uppercase text-sm mb-4 flex items-center gap-2 ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
@@ -218,7 +204,6 @@ export default function CameraPanel() {
                   </div>
                 )}
                 
-                {/* Processor Selection */}
                 <div className={`p-4 rounded-xl border-2 ${isDark ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-200'}`}>
                   <h3 className={`font-black uppercase text-sm mb-4 flex items-center gap-2 ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
                     <Activity size={16} />

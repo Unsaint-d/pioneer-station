@@ -36,7 +36,6 @@ class BoundingBoxDrawer(BaseHandler):
         #     for box in model_result['boxes']:
         #         cv2.rectangle(frame, ...)
         
-        # Демонстрация
         cv2.putText(frame, "Handler: Drawer Active", (50, 80), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
         return frame
@@ -53,7 +52,6 @@ class AsyncFileLogger(BaseHandler):
         self.thread.start()
 
     def handle(self, frame: np.ndarray, model_result: Any) -> np.ndarray:
-        # Отправляем данные в очередь (легкая операция)
         if model_result:
             self.queue.put(model_result)
         return frame
@@ -62,8 +60,6 @@ class AsyncFileLogger(BaseHandler):
         while self.running:
             try:
                 data = self.queue.get(timeout=1.0)
-                # Имитация тяжелой записи в файл
-                # with open("log.txt", "a") as f: f.write(str(data))
                 self.queue.task_done()
             except queue.Empty:
                 continue

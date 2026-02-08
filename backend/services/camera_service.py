@@ -20,16 +20,12 @@ class CameraService:
     def __init__(self):
         if self._initialized:
             return
-        # Initialize camera with default settings (IP: 192.168.4.1, Port: 8888)
-        # self.camera = Camera() # Moved to start()
         self.current_frame = None
         self.running = False
         self.thread = None
-        self.video_source = 'drone' # 'drone' or 'local'
+        self.video_source = 'drone'
         self.webcam = None
         self.camera = None
-        
-        # Plugins will be discovered in main.py startup event to avoid multiprocessing issues
         
         self._initialized = True
 
@@ -55,7 +51,6 @@ class CameraService:
         if self.running:
             return
             
-        # Initialize camera if needed and source is drone
         if self.video_source == 'drone' and self.camera is None:
             self.camera = Camera()
             
@@ -86,9 +81,7 @@ class CameraService:
                 frame = None
                 
                 if self.video_source == 'drone':
-                    # get_cv_frame returns decoded numpy array
                     if self.camera is None:
-                        # Try to reconnect or init
                         try:
                             self.camera = Camera()
                         except Exception as e:
@@ -100,7 +93,6 @@ class CameraService:
                 elif self.video_source == 'local':
                     if self.webcam is None or not self.webcam.isOpened():
                         self.webcam = cv2.VideoCapture(0)
-                        # Wait a bit for camera to warm up
                         if not self.webcam.isOpened():
                             print("Failed to open local webcam")
                             time.sleep(1)
@@ -110,27 +102,21 @@ class CameraService:
                     if ret:
                         frame = cam_frame
                     else:
-                        # If read fails, maybe camera disconnected?
                         print("Failed to read from webcam")
                         self.webcam.release()
                         self.webcam = None
                         time.sleep(1)
 
                 if frame is not None:
-                    # 1. Обработка плагинами (Нейросеть)
                     processed_frame = plugin_manager.process_frame(frame)
                     
-                    # 2. Кодирование обратно в JPEG для стриминга
-                    # quality=80 для баланса скорости/качества
                     ret, buffer = cv2.imencode('.jpg', processed_frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
                     
                     if ret:
                         self.current_frame = buffer.tobytes()
                 else:
-                    # Small sleep to prevent busy loop if no connection
                     time.sleep(0.01)
             except Exception as e:
-                # print(f"Error in camera capture loop: {e}") # Спамит в консоль
                 time.sleep(1)
 
     def get_latest_frame(self):

@@ -7,7 +7,6 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup_event():
-    # Initialize plugins on startup (avoids multiprocessing issues on import)
     print("Discovering processors...")
     plugin_manager.discover_plugins()
 

@@ -20,7 +20,7 @@ class PluginManager:
         if self._initialized:
             return
         self.processors: Dict[str, Type[BaseProcessor]] = {}
-        self.processors_metadata: Dict[str, Dict[str, str]] = {}  # Cache for name/description
+        self.processors_metadata: Dict[str, Dict[str, str]] = {}
         self.active_processor: Optional[BaseProcessor] = None
         self.processors_dir = os.path.dirname(os.path.abspath(__file__))
         self._initialized = True
@@ -30,26 +30,22 @@ class PluginManager:
         self.processors.clear()
         self.processors_metadata.clear()
         
-        # Проходим по всем .py файлам в директории
         for filename in os.listdir(self.processors_dir):
             if filename.endswith(".py") and filename not in ["__init__.py", "base.py", "manager.py"]:
                 module_name = filename[:-3]
                 file_path = os.path.join(self.processors_dir, filename)
                 
                 try:
-                    # Динамическая загрузка модуля
                     spec = importlib.util.spec_from_file_location(f"processors.{module_name}", file_path)
                     if spec and spec.loader:
                         module = importlib.util.module_from_spec(spec)
                         spec.loader.exec_module(module)
                         
-                        # Поиск классов-наследников BaseProcessor
                         for name, obj in inspect.getmembers(module):
                             if (inspect.isclass(obj) and 
                                 issubclass(obj, BaseProcessor) and 
                                 obj is not BaseProcessor):
                                 
-                                # Создаем временный экземпляр для получения имени
                                 try:
                                     temp_instance = obj()
                                     plugin_name = temp_instance.name
@@ -59,7 +55,6 @@ class PluginManager:
                                         "description": temp_instance.description
                                     }
                                     logger.info(f"Loaded processor plugin: {plugin_name}")
-                                    # Clean up the temporary instance to avoid zombie processes
                                     temp_instance.cleanup()
                                 except Exception as e:
                                     logger.error(f"Failed to instantiate plugin {name}: {e}")
@@ -69,7 +64,6 @@ class PluginManager:
 
     def get_available_processors(self) -> List[Dict[str, str]]:
         """Возвращает список доступных процессоров"""
-        # Используем кэшированные метаданные
         return list(self.processors_metadata.values())
 
     def set_active_processor(self, name: str) -> bool:
@@ -81,12 +75,10 @@ class PluginManager:
             return True
             
         if name in self.processors:
-            # Если уже активен другой - очищаем
             if self.active_processor:
                 self.active_processor.cleanup()
             
             try:
-                # Создаем новый экземпляр
                 self.active_processor = self.processors[name]()
                 logger.info(f"Activated processor: {name}")
                 return True

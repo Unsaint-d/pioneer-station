@@ -16,10 +16,8 @@ def generate_frames():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         else:
-            # Optionally yield a placeholder or just wait
             pass
         
-        # Limit to approx 25 FPS
         time.sleep(0.04)
 
 @router.get("/camera/stream")
@@ -27,7 +25,6 @@ async def video_feed():
     """
     Stream video from the drone camera using MJPEG.
     """
-    # Ensure service is running
     if not camera_service.running:
         camera_service.start()
         
